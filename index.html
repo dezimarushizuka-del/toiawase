@@ -249,11 +249,11 @@
         <div class="row-2col">
           <div class="col">
             <span class="sub-label">姓</span>
-            <input type="text" id="lastName" placeholder="鈴木" required>
+            <input type="text" id="lastName" placeholder="苗字" required>
           </div>
           <div class="col">
             <span class="sub-label">名</span>
-            <input type="text" id="firstName" placeholder="じろう" required>
+            <input type="text" id="firstName" placeholder="名前" required>
           </div>
         </div>
       </div>
@@ -397,7 +397,7 @@
       })
       .catch(function(error) {
         console.error(error);
-        statusDiv.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
+        statusDiv.textContent = "んー送信に失敗しました。時間をおいて再度お試しください。";
         statusDiv.style.background = "#fce8e6";
         statusDiv.style.color = "#c5221f";
       })
