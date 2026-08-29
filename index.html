@@ -2,63 +2,401 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>お問い合わせフォーム</title>
   <style>
-    body { font-family: sans-serif; max-width: 500px; margin: 40px auto; padding: 20px; }
-    .form-group { margin-bottom: 15px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input, textarea { width: 100%; padding: 8px; box-sizing: border-box; }
-    button { background: #007bff; color: white; padding: 10px 15px; border: none; cursor: pointer; width: 100%; }
-    button:disabled { background: #ccc; }
-    #status { margin-top: 15px; font-weight: bold; }
+    body {
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", MeiYo, sans-serif;
+      background-color: #e5f2f1;
+      margin: 0;
+      padding: 0 0 80px 0;
+      color: #333;
+    }
+
+    /* 上部ヘッダーのイラスト風背景 */
+    .header-banner {
+      height: 140px;
+      background: linear-gradient(to bottom, #83c5be 0%, #b8e0d2 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .header-banner::before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background-image: 
+        linear-gradient(to top, #2a9d8f 0%, #2a9d8f 100%),
+        linear-gradient(to top, #e76f51 0%, #e76f51 100%),
+        linear-gradient(to top, #264653 0%, #264653 100%),
+        linear-gradient(to top, #e9c46a 0%, #e9c46a 100%);
+      background-size: 30px 45px, 20px 30px, 40px 55px, 25px 35px;
+      background-position: 10% bottom, 25% bottom, 40% bottom, 60% bottom;
+      background-repeat: repeat-x;
+      opacity: 0.7;
+    }
+
+    /* メインコンテナ */
+    .container {
+      max-width: 600px;
+      margin: -40px auto 0 auto;
+      background: #ffffff;
+      padding: 40px 45px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      position: relative;
+      z-index: 10;
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 24px;
+      color: #2b2b2b;
+      text-align: center;
+      font-weight: normal;
+    }
+
+    .description {
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 35px;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 24px;
+    }
+
+    .label-wrapper {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    .badge-required {
+      background-color: #ff4d4f;
+      color: #ffffff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      font-weight: bold;
+    }
+
+    .row-2col {
+      display: flex;
+      gap: 15px;
+    }
+
+    .col {
+      flex: 1;
+    }
+
+    .sub-label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"], input[type="email"], textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 14px;
+      color: #333;
+      background-color: #fafafa;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #2a9d8f;
+      background-color: #fff;
+      box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.15);
+    }
+
+    /* ラジオボタンエリア */
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      background-color: #fafafa;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .radio-option:hover {
+      background-color: #f0fdfa;
+      border-color: #2a9d8f;
+    }
+
+    .radio-option input[type="radio"] {
+      width: auto;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .radio-option span {
+      font-size: 14px;
+      color: #333;
+    }
+
+    /* 動的注記（吹き出し） */
+    .note-box {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background-color: #fff8e6;
+      border-left: 4px solid #e9c46a;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #8a6d3b;
+      display: none; /* 初期状態は非表示 */
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 送信ボタン（通常状態） */
+    .submit-btn-wrapper {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    button {
+      width: 100%;
+      background: #2a9d8f;
+      color: #ffffff;
+      padding: 14px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    button:hover {
+      background: #218377;
+    }
+
+    /* 全入力完了で巨大化＆ぽよぽよ揺れるクラス */
+    button.ready {
+      background: #e76f51;
+      font-size: 20px;
+      padding: 20px;
+      transform: scale(1.08);
+      box-shadow: 0 8px 25px rgba(231, 111, 81, 0.4);
+      animation: bounce 1.2s infinite alternate ease-in-out;
+    }
+
+    button.ready:hover {
+      background: #d65a3c;
+    }
+
+    @keyframes bounce {
+      0% { transform: scale(1.05); }
+      100% { transform: scale(1.12); }
+    }
+
+    button:disabled {
+      background: #ccc !important;
+      transform: none !important;
+      box-shadow: none !important;
+      animation: none !important;
+      cursor: not-allowed;
+    }
+
+    #status {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
 
-  <h2>お問い合わせフォーム</h2>
-  
-  <form id="contactForm">
-    <div class="form-group">
-      <label for="name">お名前</label>
-      <input type="text" id="name" required>
-    </div>
-    <div class="form-group">
-      <label for="email">メールアドレス</label>
-      <input type="email" id="email" required>
-    </div>
-    <div class="form-group">
-      <label for="message">お問い合わせ内容</label>
-      <textarea id="message" rows="5" required></textarea>
-    </div>
-    <button type="submit" id="submitBtn">送信する</button>
-  </form>
+  <div class="header-banner"></div>
 
-  <div id="status"></div>
+  <div class="container">
+    <h2>お問い合わせフォーム</h2>
+    <p class="description">弊社にお問い合わせいただきありがとうございます。下記よりお問い合わせください。</p>
+    
+    <form id="contactForm">
+      
+      <!-- 名前（姓・名） -->
+      <div class="form-group">
+        <div class="label-wrapper">
+          <label>名前</label>
+          <span class="badge-required">必須</span>
+        </div>
+        <div class="row-2col">
+          <div class="col">
+            <span class="sub-label">姓</span>
+            <input type="text" id="lastName" placeholder="鈴木" required>
+          </div>
+          <div class="col">
+            <span class="sub-label">名</span>
+            <input type="text" id="firstName" placeholder="じろう" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- メールアドレス -->
+      <div class="form-group">
+        <div class="label-wrapper">
+          <label for="email">メールアドレス</label>
+          <span class="badge-required">必須</span>
+        </div>
+        <input type="email" id="email" placeholder="example@email.com" required>
+      </div>
+
+      <!-- お問い合わせ内容 -->
+      <div class="form-group">
+        <div class="label-wrapper">
+          <label for="message">お問い合わせ内容</label>
+          <span class="badge-required">必須</span>
+        </div>
+        <textarea id="message" rows="5" placeholder="ご自由にご記入ください" required></textarea>
+      </div>
+
+      <!-- お問い合わせの雰囲気（ラジオボタン） -->
+      <div class="form-group">
+        <div class="label-wrapper">
+          <label>お問い合わせの雰囲気</label>
+          <span class="badge-required">必須</span>
+        </div>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="intent" value="早めの解決を希望します" required>
+            <span>早めの解決を希望します</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="intent" value="ただの愚痴だよ">
+            <span>ただの愚痴だよ</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="intent" value="独り言だから気にしなくてよい">
+            <span>独り言だから気にしなくてよい</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="intent" value="今すぐ話を聞きに来い！">
+            <span>今すぐ話を聞きに来い！</span>
+          </label>
+        </div>
+        <!-- 注記表示用ボックス -->
+        <div id="noteBox" class="note-box"></div>
+      </div>
+
+      <div class="submit-btn-wrapper">
+        <button type="submit" id="submitBtn">送信する</button>
+      </div>
+
+    </form>
+
+    <div id="status"></div>
+  </div>
 
   <script>
-    // ★ここにGASのデプロイURLを貼り付けます
+    // ★ご自身のGASデプロイURLを設定してください
     const GAS_URL = "https://script.google.com/macros/s/AKfycbw1J_Rv7hrbaIgdXKPc_K91bFJUicsFibcBHs00pnR36WFrc_hSpGBB36NQNeoNaMYGiw/exec";
 
-    document.getElementById("contactForm").addEventListener("submit", async (e) => {
-      e.preventDefault(); // 画面リロードを防止
+    // ラジオボタンの選択による注記マップ
+    const noteMap = {
+      "早めの解決を希望します": "💪 がんばります",
+      "ただの愚痴だよ": "🥺 よしよし、大変やったね",
+      "独り言だから気にしなくてよい": "🫣 本当に気にしないね",
+      "今すぐ話を聞きに来い！": "⚠️ 交通費がない場合はうかがえません"
+    };
 
-      const submitBtn = document.getElementById("submitBtn");
+    const form = document.getElementById("contactForm");
+    const radioInputs = document.querySelectorAll('input[name="intent"]');
+    const noteBox = document.getElementById("noteBox");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // ① ラジオボタン変更時の注記切り替え
+    radioInputs.forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        const val = e.target.value;
+        if (noteMap[val]) {
+          noteBox.textContent = noteMap[val];
+          noteBox.style.display = "block";
+        }
+        checkFormCompletion();
+      });
+    });
+
+    // 入力監視（全項目チェック）
+    form.addEventListener("input", checkFormCompletion);
+
+    // ② 全項目入力判定＆ボタン巨大化処理
+    function checkFormCompletion() {
+      const lastName = document.getElementById("lastName").value.trim();
+      const firstName = document.getElementById("firstName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const message = document.getElementById("message").value.trim();
+      const selectedRadio = document.querySelector('input[name="intent"]:checked');
+
+      // すべて埋まっているか？
+      if (lastName && firstName && email && message && selectedRadio) {
+        submitBtn.classList.add("ready");
+        submitBtn.textContent = "早く押してー！！👆";
+      } else {
+        submitBtn.classList.remove("ready");
+        submitBtn.textContent = "送信する";
+      }
+    }
+
+    // 送信処理
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
       const statusDiv = document.getElementById("status");
 
-      // ボタンを無効化＆状態表示
       submitBtn.disabled = true;
+      submitBtn.classList.remove("ready");
+      submitBtn.textContent = "送信中...";
       statusDiv.textContent = "送信中...";
-      statusDiv.style.color = "black";
+      statusDiv.style.background = "#f0f0f0";
+      statusDiv.style.color = "#333";
 
-      // フォームデータの準備
+      const selectedRadio = document.querySelector('input[name="intent"]:checked');
+
       const formData = {
-        name: document.getElementById("name").value,
+        lastName: document.getElementById("lastName").value,
+        firstName: document.getElementById("firstName").value,
         email: document.getElementById("email").value,
-        message: document.getElementById("message").value
+        message: document.getElementById("message").value,
+        intent: selectedRadio ? selectedRadio.value : ""
       };
 
       try {
-        // GASへデータをPOST送信 (fetch API)
         const response = await fetch(GAS_URL, {
           method: "POST",
           body: JSON.stringify(formData)
@@ -67,16 +405,20 @@
         const result = await response.json();
 
         if (result.status === "success") {
-          statusDiv.textContent = "お問い合わせを受け付けました。ありがとうございます！";
-          statusDiv.style.color = "green";
-          document.getElementById("contactForm").reset(); // フォーム消去
+          statusDiv.textContent = "お問い合わせを受け付けました。自動返信メールをご確認ください。";
+          statusDiv.style.background = "#e6f4ea";
+          statusDiv.style.color = "#137333";
+          form.reset();
+          noteBox.style.display = "none";
+          checkFormCompletion();
         } else {
           throw new Error(result.message);
         }
       } catch (error) {
         console.error(error);
         statusDiv.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
-        statusDiv.style.color = "red";
+        statusDiv.style.background = "#fce8e6";
+        statusDiv.style.color = "#c5221f";
       } finally {
         submitBtn.disabled = false;
       }
