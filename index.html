@@ -249,11 +249,11 @@
         <div class="row-2col">
           <div class="col">
             <span class="sub-label">姓</span>
-            <input type="text" id="lastName" placeholder="森若" required>
+            <input type="text" id="lastName" placeholder="鈴木" required>
           </div>
           <div class="col">
             <span class="sub-label">名</span>
-            <input type="text" id="firstName" placeholder="しずか" required>
+            <input type="text" id="firstName" placeholder="じろう" required>
           </div>
         </div>
       </div>
@@ -317,9 +317,9 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbw1J_Rv7hrbaIgdXKPc_K91bFJUicsFibcBHs00pnR36WFrc_hSpGBB36NQNeoNaMYGiw/exec";
 
     const noteMap = {
-      "早めの解決を希望します": "がんばりますよー",
-      "ただの愚痴だよ": "大変やったね、愚痴ならいつでも聞こう！",
-      "独り言だから気にしなくてよい": "わかった、本当に気にしないね！",
+      "早めの解決を希望します": "がんばります",
+      "ただの愚痴だよ": "大変やったね",
+      "独り言だから気にしなくてよい": "本当に気にしないね",
       "今すぐ話を聞きに来い！": "交通費がない場合はうかがえません"
     };
 
@@ -350,14 +350,14 @@
 
       if (lastName && firstName && email && message && selectedRadio) {
         submitBtn.classList.add("ready");
-        submitBtn.textContent = "早く押して！";
+        submitBtn.textContent = "早く押してー！！";
       } else {
         submitBtn.classList.remove("ready");
         submitBtn.textContent = "送信する";
       }
     }
 
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", function(e) {
       e.preventDefault();
 
       const statusDiv = document.getElementById("status");
@@ -370,41 +370,40 @@
       statusDiv.style.color = "#333";
 
       const selectedRadio = document.querySelector('input[name="intent"]:checked');
+      const fullName = document.getElementById("lastName").value.trim() + " " + document.getElementById("firstName").value.trim();
 
-      // データ名を正確に整理
-      const formData = {
-        name: document.getElementById("lastName").value + " " + document.getElementById("firstName").value,
-        email: document.getElementById("email").value,
-        intent: selectedRadio ? selectedRadio.value : "",
-        message: document.getElementById("message").value
-      };
+      // GASが100%確実に受け取れる形式パラメータ
+      const params = new URLSearchParams();
+      params.append("name", fullName);
+      params.append("email", document.getElementById("email").value.trim());
+      params.append("intent", selectedRadio ? selectedRadio.value : "");
+      params.append("message", document.getElementById("message").value.trim());
 
-      try {
-        const response = await fetch(GAS_URL, {
-          method: "POST",
-          body: JSON.stringify(formData)
-        });
-
-        const result = await response.json();
-
-        if (result.status === "success") {
-          statusDiv.textContent = "ふー、お問い合わせを受け付けました。自動返信メールをご確認ください。";
-          statusDiv.style.background = "#e6f4ea";
-          statusDiv.style.color = "#137333";
-          form.reset();
-          noteBox.style.display = "none";
-          checkFormCompletion();
-        } else {
-          throw new Error(result.message);
-        }
-      } catch (error) {
+      fetch(GAS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: params.toString()
+      })
+      .then(function() {
+        statusDiv.textContent = "ふーお問い合わせを受け付けました！自動返信メールをご確認ください。";
+        statusDiv.style.background = "#e6f4ea";
+        statusDiv.style.color = "#137333";
+        form.reset();
+        noteBox.style.display = "none";
+        checkFormCompletion();
+      })
+      .catch(function(error) {
         console.error(error);
         statusDiv.textContent = "送信に失敗しました。時間をおいて再度お試しください。";
         statusDiv.style.background = "#fce8e6";
         statusDiv.style.color = "#c5221f";
-      } finally {
+      })
+      .finally(function() {
         submitBtn.disabled = false;
-      }
+      });
     });
   </script>
 </body>
